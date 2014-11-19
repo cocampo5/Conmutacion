@@ -1,59 +1,75 @@
 #include <WiFly.h>
 #include <SPI.h>
- 
-#define PIN 3 //led pin
 Server server(80); //enables a webserver on port 80
 void setup()
 {
-  Serial.begin(9600);//setting baud rate
-  pinMode(PIN,OUTPUT);//set the LED pin as output
-  
+  Serial.begin(9600);
+  pinMode(2,OUTPUT);
+  pinMode(3,OUTPUT);
+  pinMode(4,OUTPUT);
   Serial.println("connecting.........");
-  WiFly.begin();   //starts the Wifly shield with the hotspot configuration
+  WiFly.begin();   
   Serial.println("Done!");
-  
+
   if (!WiFly.join("TP-LINK_LCD", "controldigital"))//change ssid and passphrase to match your hotspot settings
   {
     Serial.println(F("Association failed."));
     while (1) {
-      // Hang on failure.
+
     }
   }
-  
+
   Serial.print("IP Address: ");
-  Serial.println(WiFly.ip());//prints the ip address of the wifly shield
-  
-  server.begin();   // begin the server  
+  Serial.println(WiFly.ip());
+  server.begin();   
 }
- 
+
 void loop()
 {
-  Client client = server.available();       
+  Client client = server.available();
   if (client) 
-  {                                   //checks if their is a connection
+  {                                  
     while (client.connected()) 
     {
       if (client.available()) 
-      {            //checks if the connection is still available
-        char c = client.read();           // reads the http request
+      {            
+        char c = client.read();          
         if (c == '$') 
-        {                        //if their is a char $ present
-           c = client.read();             //the character after it is read
-           if(c=='1')
-           {
-             Serial.println("LED off");
-             digitalWrite(PIN, LOW);//switches off the LED
-           }
-           else if(c=='2')
-           {
-             Serial.println("LED on");
-             digitalWrite(PIN, HIGH);//switches on the LED
-           } 
-         }
-         if (c=='\n'||c=='r')break;//if end of line or carriage return, end    loop
-       }
+        {                       
+          c = client.read();             
+          if(c=='1')
+          {
+            Serial.println("Verde");
+            digitalWrite(2, HIGH);
+            digitalWrite(3, LOW);
+            digitalWrite(4, LOW);
+          }
+          if(c=='2')
+          {
+            Serial.println("Rojo");
+            digitalWrite(3, HIGH);
+            digitalWrite(4, LOW);
+            digitalWrite(2, LOW);
+          } 
+          if(c=='3')
+          {
+            Serial.println("Azul");
+            digitalWrite(4, HIGH);
+            digitalWrite(3, LOW);
+            digitalWrite(2
+            , LOW);
+            
+          } 
+        }
+        if (c=='\n'||c=='r')break;
+      }
     }
-    delay(4);        // gives some time to read
-    //client.stop(); //stops client
+    delay(4);        
+
+    client.stop(); 
+
   }
 }
+
+
+
